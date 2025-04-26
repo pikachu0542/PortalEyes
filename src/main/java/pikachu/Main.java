@@ -55,7 +55,9 @@ public class Main {
                 try { extended.write("seed, starter_x, starter_z, eyes, portal_x, portal_y, portal_z\n"); }
                 catch (IOException e) { e.printStackTrace(); }
 
-                CPos[] starts = stronghold.getStarts(bs, strongholds, new JRand(0L));
+                JRand jrand = new JRand(0L);
+
+                CPos[] starts = stronghold.getStarts(bs, strongholds, jrand);
                 for (CPos start : starts) {
                     StrongholdGenerator gen = new StrongholdGenerator(version);
                     int starterX = start.getX();
@@ -68,13 +70,14 @@ public class Main {
                     gen.pieceList.forEach(piece -> {
                         if (piece instanceof PortalRoom) {
                             PortalRoom pr = (PortalRoom) piece;
-                            pr.process(new JRand(seed), new BPos(starterX, starterY, starterZ));
 
-//                            Vec3i portal_center = Util.applyVecTransform(pr, new Vec3i(5, 4, 10));
+//                            Vec3i portal_center = pr.
                             Vec3i portal_center = pr.getBoundingBox().getCenter();
                             int x = portal_center.getX();
                             int y = portal_center.getY();
                             int z = portal_center.getZ();
+
+                            pr.process(jrand, new BPos(x, y, z));
 
                             int eyes = countTrue(pr.getEyes());
 
@@ -84,7 +87,7 @@ public class Main {
                                 System.out.println(eye);
                             }
 
-                            System.out.println(pr.getEyes().toString());
+                            //System.out.println(pr.getEyes().toString());
                             if (eyes >= minEyes) {
                                 try {
                                     extended.write("Seed: %d, Starter X: %d, Starter Z: %d, Eyes: %d, X: %d, Y: %d, Z: %d\n".formatted(seed, (starterX * 16) + 4, (starterZ * 16) + 4, eyes, x, y, z));
@@ -112,7 +115,6 @@ public class Main {
         for (boolean item : array) {
             if (item) numTrue++;
         }
-
 
         return numTrue;
     }
